@@ -44,26 +44,54 @@
 
     <RadioGroup
         android:id="@+id/choises"
-        android:layout_width="match_parent"
+        android:layout_width="316dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_weight="30"
-        android:visibility="invisible"
-        />
+        android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/check"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:text="Вид игры"
+        android:textAlignment="center">
+
+    </TextView>
+
+    <Spinner
+        android:id="@+id/planets_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:textAlignment="center"
+        android:layout_marginBottom="15dp"/>
+
+    <Button style="@style/RoundedCornerButton"
+        android:background="@drawable/custom_buttons"
+        android:id="@+id/check"
+        android:layout_width="152dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_weight="10"
         android:onClick="check"
-        android:text="Начать" />
+        android:text="Начать"
+        android:layout_margin="4dp"/>
 
-    <Button
+
+
+    <Button style="@style/RoundedCornerButton"
+        android:background="@drawable/custom_buttons"
         android:id="@+id/exit"
-        android:layout_width="match_parent"
+        android:layout_width="152dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_weight="10"
-        android:text="Завершить"
         android:onClick="finish"
-        android:visibility="invisible"/>
+        android:text="Завершить"
+        android:visibility="invisible"
+        android:layout_margin="4dp"/>
 </LinearLayout>

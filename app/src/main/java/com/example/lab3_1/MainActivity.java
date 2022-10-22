@@ -9,10 +9,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView picture;
     private RadioGroup radioGroup;
     private Button btn1;
+    private Spinner gameType;
+    private TextView textView;
+
     boolean firstPress = true;//первое ли нажатие на кнопку
-    private String link = "https://www.dorogavrim.ru/articles/flagi_stran_mira/";
-    private String domain = "https://www.dorogavrim.ru";
     private ArrayList<String> names = new ArrayList<>();//названия для угадывания
     private ArrayList<String> urls = new ArrayList<>();//картинки для угадывания
     private int numberOfTrueImage = 0; // номер картинки, которую угадываем
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private int rightAnswers = 0; // количество правильных ответов
     private boolean firstLaunch = true;
     private int numberOfAnswers = 4;
+    private ParserParams parserParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,15 @@ public class MainActivity extends AppCompatActivity {
         picture = findViewById(R.id.image);
         radioGroup = findViewById(R.id.choises);
         btn1 = findViewById(R.id.check);
+        gameType = findViewById(R.id.planets_spinner);
+        textView = findViewById(R.id.textView3);
+
+        // Создаем адаптер ArrayAdapter с помощью массива строк и стандартной разметки элемета spinner
+        ArrayAdapter<CharSequence>adapter=ArrayAdapter.createFromResource(this, R.array.gameTypes, android.R.layout.simple_spinner_item);
+        // Определяем разметку для использования при выборе элемента
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Применяем адаптер к элементу spinner
+        gameType.setAdapter(adapter);
 
         if (getIntent().getExtras() != null) {
             this.round = getIntent().getExtras().getInt("rounds");
@@ -75,9 +88,6 @@ public class MainActivity extends AppCompatActivity {
             this.rightAnswers = 0;
         }
 
-        //Скачиваем и парсим данные с сайта
-        getContent(link);
-        int a =0;
     }
 
     private void randomOptions(int numberOfAnswers) {
@@ -150,20 +160,28 @@ public class MainActivity extends AppCompatActivity {
         DownloadContentTask task = new DownloadContentTask();
         try {
             String content = task.execute(url).get();
-            String  start = "<table style=\"width: 100%;\" align=\"center\">";
+           /* String  start = "<table style=\"width: 100%;\" align=\"center\">";
             String finish = "</table>";
+            String  start = "<div class=\"models_list row\">";
+            String finish = "<div class=\"col-md-3 col-sm-4 main-col-right\">";*/
+            String  start = parserParams.start;
+            String finish = parserParams.finish;
             Pattern pattern = Pattern.compile(start+ "(.*?)"+ finish);
             Matcher matcher = pattern.matcher(content);
             String splitContent = "";
             while (matcher.find())
                 splitContent = matcher.group(1);
 
-            Pattern paternImg = Pattern.compile(" src=\"(.*?)\" style=");
+            /*Pattern paternImg = Pattern.compile(" src=\"(.*?)\" style=");
             Pattern patternName = Pattern.compile("<br>\t\t (.*?)</");
+            Pattern paternImg = Pattern.compile(" <span class=\"ico_box\">                                <img src=\"(.*?)\" class=\"icon\"");
+            Pattern patternName = Pattern.compile("<span class=\"name\">(.*?)</span>");*/
+            Pattern paternImg = Pattern.compile(parserParams.paternImg);
+            Pattern patternName = Pattern.compile(parserParams.patternName);
             Matcher matcherImg = paternImg.matcher(splitContent);
             Matcher matcherName = patternName.matcher(splitContent);
             while (matcherImg.find())
-                urls.add(domain+ matcherImg.group(1));
+                urls.add(parserParams.domain+ matcherImg.group(1));
             while (matcherName.find())
                 names.add(matcherName.group(1));
 
@@ -209,10 +227,43 @@ public class MainActivity extends AppCompatActivity {
     public void check(View view){
         try {   //первое нажатие на кнопку: выводит картинку и поле для ввода фамилии
             if (firstPress) {
+
+                String type = gameType.getSelectedItem().toString().split(" : ")[0];
+                switch (type){
+                    case "Флаги":
+                        parserParams = new ParserParams(
+                                "https://www.dorogavrim.ru/articles/flagi_stran_mira/",
+                                "https://www.dorogavrim.ru",
+                                "<table style=\"width: 100%;\" align=\"center\">",
+                                "</table>",
+                                " src=\"(.*?)\" style=",
+                                "<br>\t\t (.*?)</"
+                        );
+                        break;
+
+                    case "Знаменитости":
+                        parserParams = new ParserParams(
+                                "https://www.theplace.ru/photos/",
+                                "https://www.theplace.ru",
+                                "<div class=\"models_list row\">",
+                                "<div class=\"col-md-3 col-sm-4 main-col-right\">",
+                                " <span class=\"ico_box\">                                <img src=\"(.*?)\" class=\"icon\"",
+                                "<span class=\"name\">(.*?)</span>"
+
+                        );
+                        break;
+                }
+
+                //Скачиваем и парсим данные с сайта
+                getContent(parserParams.link);
+                int a =0;
+
                 playGame();
                 randomOptions(numberOfAnswers);
                 btn1.setText("Ответ");
                 radioGroup.setVisibility(View.VISIBLE);
+                textView.setVisibility(View.INVISIBLE);
+                gameType.setVisibility(View.INVISIBLE);
                 firstPress = false;
             }
             //второе и последющие нажатия на кнопку проверяют

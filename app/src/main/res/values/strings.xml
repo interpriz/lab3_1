@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Угадай страну</string>
+    <string name="app_name">Угадай название по картинке</string>
+    <string-array name="gameTypes">
+        <item>Флаги</item>
+        <item>Знаменитости</item>
+    </string-array>
 </resources>
