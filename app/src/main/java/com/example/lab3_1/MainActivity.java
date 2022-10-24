@@ -32,8 +32,6 @@ import java.util.regex.Pattern;
 
 //Volley — это HTTP-библиотека, которая упрощает и ускоряет работу в сети для приложений Android.
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -54,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private String context = "";
     private int round = 1; //номер раунда
     private int rightAnswers = 0; // количество правильных ответов
-    private boolean firstLaunch = true;
     private int numberOfAnswers = 4;
     private ParserParams parserParams;
 
@@ -157,35 +154,28 @@ public class MainActivity extends AppCompatActivity {
     //Метод, который загружает в  массив список изображений:
     private  void getContent(String url)
     {
+        String  start = parserParams.start;
+        String finish = parserParams.finish;
+
+        Pattern paternImg = Pattern.compile(parserParams.paternImg);
+        Pattern patternName = Pattern.compile(parserParams.patternName);
+
         DownloadContentTask task = new DownloadContentTask();
         try {
             String content = task.execute(url).get();
-           /* String  start = "<table style=\"width: 100%;\" align=\"center\">";
-            String finish = "</table>";
-            String  start = "<div class=\"models_list row\">";
-            String finish = "<div class=\"col-md-3 col-sm-4 main-col-right\">";*/
-            String  start = parserParams.start;
-            String finish = parserParams.finish;
+
             Pattern pattern = Pattern.compile(start+ "(.*?)"+ finish);
             Matcher matcher = pattern.matcher(content);
             String splitContent = "";
             while (matcher.find())
                 splitContent = matcher.group(1);
 
-            /*Pattern paternImg = Pattern.compile(" src=\"(.*?)\" style=");
-            Pattern patternName = Pattern.compile("<br>\t\t (.*?)</");
-            Pattern paternImg = Pattern.compile(" <span class=\"ico_box\">                                <img src=\"(.*?)\" class=\"icon\"");
-            Pattern patternName = Pattern.compile("<span class=\"name\">(.*?)</span>");*/
-            Pattern paternImg = Pattern.compile(parserParams.paternImg);
-            Pattern patternName = Pattern.compile(parserParams.patternName);
             Matcher matcherImg = paternImg.matcher(splitContent);
             Matcher matcherName = patternName.matcher(splitContent);
             while (matcherImg.find())
                 urls.add(parserParams.domain+ matcherImg.group(1));
             while (matcherName.find())
                 names.add(matcherName.group(1));
-
-
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -225,38 +215,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void check(View view){
-        try {   //первое нажатие на кнопку: выводит картинку и поле для ввода фамилии
-            if (firstPress) {
+        //первое нажатие на кнопку: выводит картинку и поле для ввода фамилии
+        if (firstPress) {
 
-                String type = gameType.getSelectedItem().toString().split(" : ")[0];
-                switch (type){
-                    case "Флаги":
-                        parserParams = new ParserParams(
-                                "https://www.dorogavrim.ru/articles/flagi_stran_mira/",
-                                "https://www.dorogavrim.ru",
-                                "<table style=\"width: 100%;\" align=\"center\">",
-                                "</table>",
-                                " src=\"(.*?)\" style=",
-                                "<br>\t\t (.*?)</"
-                        );
-                        break;
-
-                    case "Знаменитости":
-                        parserParams = new ParserParams(
-                                "https://www.theplace.ru/photos/",
-                                "https://www.theplace.ru",
-                                "<div class=\"models_list row\">",
-                                "<div class=\"col-md-3 col-sm-4 main-col-right\">",
-                                " <span class=\"ico_box\">                                <img src=\"(.*?)\" class=\"icon\"",
-                                "<span class=\"name\">(.*?)</span>"
-
-                        );
-                        break;
-                }
-
+            String type = gameType.getSelectedItem().toString().split(" : ")[0];
+            switch (type){
+                case "Флаги":
+                    parserParams = gameTypes.Flags.getValue();
+                    break;
+                case "Знаменитости":
+                    parserParams = gameTypes.Сelebrities.getValue();
+                    break;
+                case "Кошки":
+                    parserParams = gameTypes.СatBreeds.getValue();
+                    break;
+                case "Собаки":
+                    parserParams = gameTypes.DogBreeds.getValue();
+                    break;
+            }
+            if(parserParams!=null){
                 //Скачиваем и парсим данные с сайта
                 getContent(parserParams.link);
-                int a =0;
 
                 playGame();
                 randomOptions(numberOfAnswers);
@@ -265,43 +244,45 @@ public class MainActivity extends AppCompatActivity {
                 textView.setVisibility(View.INVISIBLE);
                 gameType.setVisibility(View.INVISIBLE);
                 firstPress = false;
+            }else{
+                Toast toast = Toast.makeText(this, "Такой игры нет!", Toast.LENGTH_SHORT);
+                toast.show();
             }
-            //второе и последющие нажатия на кнопку проверяют
-            // введенную фамилию и выводят новую картинку
-            else {
-                int id = radioGroup.getCheckedRadioButtonId();
-                if (id != -1) {
-                    String answer = ((RadioButton) findViewById(id)).getText().toString();
-                    if (!(answer.equals(""))) {
-                        if (answer.equals(names.get(numberOfTrueImage))) {
-                            Toast toast = Toast.makeText(this, "Правильно!", Toast.LENGTH_SHORT);
-                            toast.show();
-                            this.rightAnswers++;
-                        } else {
-                            Toast toast = Toast.makeText(this, "Неправильно! (Ответ - "+names.get(numberOfTrueImage)+")", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                        playGame();
-                        randomOptions(numberOfAnswers);
+
+        }
+        //второе и последющие нажатия на кнопку проверяют
+        // введенную фамилию и выводят новую картинку
+        else {
+            int id = radioGroup.getCheckedRadioButtonId();
+            if (id != -1) {
+                String answer = ((RadioButton) findViewById(id)).getText().toString();
+                if (!(answer.equals(""))) {
+                    if (answer.equals(names.get(numberOfTrueImage))) {
+                        Toast toast = Toast.makeText(this, "Правильно!", Toast.LENGTH_SHORT);
+                        toast.show();
+                        this.rightAnswers++;
+                    } else {
+                        Toast toast = Toast.makeText(this, "Неправильно! (Ответ - "+names.get(numberOfTrueImage)+")", Toast.LENGTH_SHORT);
+                        toast.show();
                     }
-                    this.round++;
-                } else {
-                    Toast toast = Toast.makeText(this, "Ответ не выбран", Toast.LENGTH_SHORT);
-                    toast.show();
+                    playGame();
+                    randomOptions(numberOfAnswers);
                 }
+                this.round++;
+            } else {
+                Toast toast = Toast.makeText(this, "Ответ не выбран", Toast.LENGTH_SHORT);
+                toast.show();
             }
-            TextView textView1 = findViewById(R.id.textView1);
-            String questionNo = "Вопрос № " + this.round;
-            textView1.setText(questionNo);
-            TextView textView2 = findViewById(R.id.textView2);
-            String count = this.rightAnswers + "/" + (this.round - 1);
-            textView2.setText(count);
-            if (this.round == 2) {
-                Button finishButton = findViewById(R.id.exit);
-                finishButton.setVisibility(View.VISIBLE);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        TextView textView1 = findViewById(R.id.textView1);
+        String questionNo = "Вопрос № " + this.round;
+        textView1.setText(questionNo);
+        TextView textView2 = findViewById(R.id.textView2);
+        String count = this.rightAnswers + "/" + (this.round - 1);
+        textView2.setText(count);
+        if (this.round == 2) {
+            Button finishButton = findViewById(R.id.exit);
+            finishButton.setVisibility(View.VISIBLE);
         }
 
     }

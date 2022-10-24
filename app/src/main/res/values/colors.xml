@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue_50">#FF22C2FF</color>
-    <color name="blue_200">#FF2286FC</color>
-    <color name="blue_350">#FF2260FA</color>
-    <color name="blue_500">#FF2200EE</color>
-    <color name="blue_700">#FF2200B3</color>
-    <color name="red_350">#FFFA0000</color>
+
+    <color name="orange">#fa6d1c</color>
+    <color name="grey">#e5e5e5</color>
+    <color name="dark_grey">#7a7a7a</color>
 
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
