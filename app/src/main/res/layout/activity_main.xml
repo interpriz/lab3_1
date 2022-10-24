@@ -10,9 +10,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="57dp"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:orientation="horizontal"
         android:weightSum="2">
 
 
@@ -35,29 +35,28 @@
 
     <ImageView
         android:id="@+id/image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_weight="30"
-        tools:srcCompat="@tools:sample/avatars"
-        />
+        android:layout_width="266dp"
+        android:layout_height="149dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="20"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <RadioGroup
         android:id="@+id/choises"
         android:layout_width="316dp"
-        android:layout_height="wrap_content"
+        android:layout_height="183dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="30"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:layout_weight="20" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
         android:text="Вид игры"
-        android:textAlignment="center">
+        android:textAlignment="center"
+        android:layout_weight="1">
 
     </TextView>
 
@@ -70,16 +69,17 @@
         android:textAlignment="center"
         android:layout_marginBottom="15dp"/>
 
-    <Button style="@style/RoundedCornerButton"
-        android:background="@drawable/custom_buttons"
+    <Button
         android:id="@+id/check"
+        style="@style/RoundedCornerButton"
         android:layout_width="152dp"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:layout_gravity="center_horizontal"
+        android:layout_margin="4dp"
         android:layout_weight="10"
+        android:background="@drawable/custom_buttons"
         android:onClick="check"
-        android:text="Начать"
-        android:layout_margin="4dp"/>
+        android:text="Начать" />
 
 
 
@@ -87,7 +87,7 @@
         android:background="@drawable/custom_buttons"
         android:id="@+id/exit"
         android:layout_width="152dp"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:layout_gravity="center_horizontal"
         android:layout_weight="10"
         android:onClick="finish"
